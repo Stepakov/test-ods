@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PostRequestFilter;
 use App\Http\Requests\PostRequestStore;
 use App\Http\Requests\PostRequestUpdate;
 use App\Http\Resources\PostResource;
@@ -16,10 +17,15 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index( PostRequestFilter $request )
     {
+        $data = $request->validated();
+        $page = $data['page'] ?? 1;
+        $perPage = $data['per_page'] ?? 3;
 
-        $posts = Post::query()->where( 'is_published', 1 )->get();
+        $posts = Post::query()
+            ->where( 'is_published', 1 )
+            ->paginate( $perPage, [ '*' ], 'page', $page );
 
         return PostResource::collection($posts);
     }
@@ -62,7 +68,6 @@ class PostController extends Controller
 
 //        dd( $data );
 
-        // Логика публикации
         if (
             isset($data['is_published']) &&
             $data['is_published'] &&
