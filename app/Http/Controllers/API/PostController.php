@@ -19,7 +19,7 @@ class PostController extends Controller
     public function index()
     {
 
-        $posts = Post::all();
+        $posts = Post::query()->where( 'is_published', 1 )->get();
 
         return PostResource::collection($posts);
     }

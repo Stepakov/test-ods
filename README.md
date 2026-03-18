@@ -15,8 +15,8 @@ REST API для роботи з posts на Laravel 10.
 ## 🚀 Встановлення
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone git@github.com:Stepakov/test-ods.git
+cd test-ods
 
 composer install
 
@@ -194,6 +194,7 @@ http://127.0.0.1:8000/api
 * Не робив фабрики
 * Використав касти для published_at
 * Не робив вивод постів постранично
-* Не робив фільтрацію постів (виводити тільки пости із паблішт)
+* Фільтрація постів
+* Не робив окремо адмінку та окремо публічну частину
 
 ---
