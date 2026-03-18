@@ -4,13 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 class Post extends Model
 {
     use HasFactory;
     use Sluggable;
 
-    protected $fillable = [ 'title', 'content', 'is_published' ];
+    protected $fillable = [ 'title', 'content', 'is_published', 'published_at' ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
 
     public function sluggable(): array
     {
