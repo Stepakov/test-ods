@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Date;
 
-class PostController extends Controller
+class PostController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -20,12 +20,8 @@ class PostController extends Controller
     public function index( PostRequestFilter $request )
     {
         $data = $request->validated();
-        $page = $data['page'] ?? 1;
-        $perPage = $data['per_page'] ?? 3;
 
-        $posts = Post::query()
-            ->where( 'is_published', 1 )
-            ->paginate( $perPage, [ '*' ], 'page', $page );
+        $posts = $this->service->index( $data );
 
         return PostResource::collection($posts);
     }
@@ -35,18 +31,9 @@ class PostController extends Controller
      */
     public function store(PostRequestStore $request)
     {
-        $publishedAt = $request->published_at;
+        $data = $request->validated();
 
-        if ($request->is_published && !$publishedAt) {
-            $publishedAt = now();
-        }
-
-        $post = Post::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'is_published' => $request->is_published ? 1 : 0,
-            'published_at' => $publishedAt,
-        ]);
+        $post = $this->service->store( $data );
 
         return PostResource::make( $post );
     }
@@ -66,18 +53,7 @@ class PostController extends Controller
     {
         $data = $request->validated();
 
-//        dd( $data );
-
-        if (
-            isset($data['is_published']) &&
-            $data['is_published'] &&
-            empty($data['published_at']) &&
-            !$post->published_at
-        ) {
-            $data['published_at'] = now();
-        }
-
-        $post->update($data);
+        $post = $this->service->update( $data, $post );
 
         return PostResource::make($post);
     }
@@ -88,8 +64,8 @@ class PostController extends Controller
     public function destroy($post)
     {
         $post = Post::find( $post );
-        if (!$post) {
 
+        if (!$post) {
             return response()->json(['message' => 'Not found'], 404);
         }
 
