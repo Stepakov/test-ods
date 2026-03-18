@@ -30,8 +30,8 @@ class PostRequestStore extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|max:255|min:3',
-            'content' => 'required',
+            'title' => 'required|max:225',
+            'content' => 'required|min:10',
             'is_published' => 'nullable',
         ];
     }
