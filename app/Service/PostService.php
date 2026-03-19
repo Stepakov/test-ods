@@ -10,31 +10,42 @@ class PostService
 {
     public function store( array $data ) : Post
     {
-        if ($data[ 'is_published' ] && !$data[ 'is_published' ]) {
-            $publishedAt = now();
+        $isPublished = !empty( $data[ 'is_published' ] );
+        $publishedAt = $data[ 'published_at' ] ?? null;
+
+        if (
+            $isPublished // якщо пост публікується
+            &&
+            !$publishedAt // і дата не задана
+        ) {
+            $publishedAt = now(); // встановлювати поточну дату
         }
 
-        $post = Post::create([
-            'title' => $data[ 'title' ],
-            'content' => $data[ 'content' ],
-            'is_published' => $data[ 'is_published' ] ? 1 : 0,
-            'published_at' => $data[ 'is_published' ] ? now() : null,
+        return Post::create([
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'is_published' => $isPublished,
+            'published_at' => $publishedAt,
         ]);
-
-        return $post;
     }
 
 
     public function update( array $data, Post $post ) : Post
     {
+        // В апдейт передали из_паблішт
+        if (array_key_exists('is_published', $data)) {
 
-        if (
-            isset($data['is_published']) &&
-            $data['is_published'] &&
-            empty($data['published_at']) &&
-            !$post->published_at
-        ) {
-            $data['published_at'] = now();
+            $isPublished = !empty($data['is_published']);
+            $data['is_published'] = $isPublished;
+
+            // Якщо публікуєм, то чи потрібно ставити дату?
+            if (
+                $isPublished && // якщо пост публікується
+                empty($data['published_at']) && // не всказана дата в апдейт-запросі
+                !$post->published_at // в запису порожне поле з датою публікації
+            ) {
+                $data['published_at'] = now(); // тоді вписуємо поточну дату
+            }
         }
 
         $post->update($data);
