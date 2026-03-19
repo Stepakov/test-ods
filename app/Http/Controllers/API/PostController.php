@@ -61,18 +61,10 @@ class PostController extends BaseController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($post)
+    public function destroy(Post $post)
     {
-        $post = Post::find( $post );
-
-        if (!$post) {
-            return response()->json(['message' => 'Not found'], 404);
-        }
-
         $post->delete();
 
-        return response()->json([
-            'message' => 'Post deleted successfully'
-        ]);
+        return response()->noContent();
     }
 }
