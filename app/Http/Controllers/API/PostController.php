@@ -11,6 +11,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Date;
+use function PHPUnit\Framework\isInstanceOf;
 
 class PostController extends BaseController
 {
@@ -33,9 +34,9 @@ class PostController extends BaseController
     {
         $data = $request->validated();
 
-        $post = $this->service->store( $data );
+        $result = $this->service->store( $data );
 
-        return PostResource::make( $post );
+        return $result instanceof Post ? PostResource::make($result) : $result;
     }
 
     /**
@@ -53,9 +54,9 @@ class PostController extends BaseController
     {
         $data = $request->validated();
 
-        $post = $this->service->update( $data, $post );
+        $result = $this->service->update( $data, $post );
 
-        return PostResource::make($post);
+        return $result instanceof Post ? PostResource::make($result) : $result;
     }
 
     /**

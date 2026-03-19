@@ -3,12 +3,13 @@
 namespace App\Service;
 
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 
 class PostService
 {
-    public function store( array $data ) : Post
+    public function store( array $data ) : Post|JsonResponse
     {
         $isPublished = !empty($data['is_published']);
 
@@ -18,11 +19,20 @@ class PostService
             $data['published_at'] ?? null
         );
 
-        return Post::create($data);
+        try{
+            $post = Post::create($data);
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'message' => 'Server error'
+            ], 500);
+        }
+
+        return $post;
     }
 
 
-    public function update( array $data, Post $post ) : Post
+    public function update( array $data, Post $post ) : Post|JsonResponse
     {
         if (array_key_exists('is_published', $data)) {
 
@@ -36,7 +46,15 @@ class PostService
             );
         }
 
-        $post->update($data);
+        try{
+            $post->update($data);
+            $post->refresh();
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'message' => 'Server error'
+            ], 500);
+        }
 
         return $post;
     }
